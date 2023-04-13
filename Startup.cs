@@ -1,6 +1,9 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Temachti.Api.Filters;
 using Temachti.Api.Middlewares;
@@ -43,7 +46,14 @@ public class Startup
         // services.AddResponseCaching();
 
         // agregamos autenticacion
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters{
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["jwtkey"])),
+            ClockSkew = TimeSpan.Zero // tiempo de gracia por defecto es 5 minutos
+        });
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
@@ -54,6 +64,13 @@ public class Startup
 
         //configuramos AutoMapper
         services.AddAutoMapper(typeof(Startup));
+
+        //configuramos el identity
+        services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders()
+        ;
+
     }
 
     /// <summary>

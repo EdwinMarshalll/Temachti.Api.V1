@@ -23,108 +23,108 @@ public class RolesController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpGet("{id:int}", Name = "GetRolById")]
-    public async Task<ActionResult<DTORole>> Get(int id)
-    {
-        var role = await context.Roles.FirstOrDefaultAsync(roleDB => roleDB.Id == id);
-        if (role is null)
-        {
-            return NotFound();
-        }
+    // [HttpGet("{id:int}", Name = "GetRolById")]
+    // public async Task<ActionResult<DTORole>> Get(int id)
+    // {
+    //     var role = await context.Roles.FirstOrDefaultAsync(roleDB => roleDB.Id == id);
+    //     if (role is null)
+    //     {
+    //         return NotFound();
+    //     }
 
-        return mapper.Map<DTORole>(role);
-    }
+    //     return mapper.Map<DTORole>(role);
+    // }
 
-    [HttpGet]
-    public async Task<ActionResult<List<DTORole>>> Get()
-    {
-        var roles = await context.Roles.ToListAsync();
-        return mapper.Map<List<DTORole>>(roles);
-    }
+    // [HttpGet]
+    // public async Task<ActionResult<List<DTORole>>> Get()
+    // {
+    //     var roles = await context.Roles.ToListAsync();
+    //     return mapper.Map<List<DTORole>>(roles);
+    // }
 
-    [HttpPost]
-    public async Task<ActionResult> Post(DTORoleCreate dtoRoleCreate)
-    {
-        var roleExists = await context.Roles.AnyAsync(roleDb =>
-            roleDb.Code == dtoRoleCreate.Code ||
-            roleDb.Name == dtoRoleCreate.Name
-        );
+    // [HttpPost]
+    // public async Task<ActionResult> Post(DTORoleCreate dtoRoleCreate)
+    // {
+    //     var roleExists = await context.Roles.AnyAsync(roleDb =>
+    //         roleDb.Code == dtoRoleCreate.Code ||
+    //         roleDb.Name == dtoRoleCreate.Name
+    //     );
 
-        if (roleExists)
-        {
-            return BadRequest($"Ya existe un rol con el nombre o codigo proporcionado");
-        }
+    //     if (roleExists)
+    //     {
+    //         return BadRequest($"Ya existe un rol con el nombre o codigo proporcionado");
+    //     }
 
-        var role = mapper.Map<Role>(dtoRoleCreate);
-        role.IsActive = true;
+    //     var role = mapper.Map<Role>(dtoRoleCreate);
+    //     role.IsActive = true;
 
-        context.Add(role);
-        await context.SaveChangesAsync();
+    //     context.Add(role);
+    //     await context.SaveChangesAsync();
 
-        var dtoRole = mapper.Map<DTORole>(role);
+    //     var dtoRole = mapper.Map<DTORole>(role);
 
-        return CreatedAtRoute("GetRolById", new { Id = role.Id }, dtoRole);
-    }
+    //     return CreatedAtRoute("GetRolById", new { Id = role.Id }, dtoRole);
+    // }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(DTORoleCreate dtoRoleCreate, int id)
-    {
-        var roleExists = await context.Roles.AnyAsync(roleDB => roleDB.Id == id);
-        if (!roleExists)
-        {
-            return NotFound();
-        }
+    // [HttpPut("{id:int}")]
+    // public async Task<ActionResult> Put(DTORoleCreate dtoRoleCreate, int id)
+    // {
+    //     var roleExists = await context.Roles.AnyAsync(roleDB => roleDB.Id == id);
+    //     if (!roleExists)
+    //     {
+    //         return NotFound();
+    //     }
 
-        var role = mapper.Map<Role>(dtoRoleCreate);
-        role.Id = id;
+    //     var role = mapper.Map<Role>(dtoRoleCreate);
+    //     role.Id = id;
 
-        context.Update(role);
-        await context.SaveChangesAsync();
-        return NoContent();
-    }
+    //     context.Update(role);
+    //     await context.SaveChangesAsync();
+    //     return NoContent();
+    // }
 
-    [HttpPatch("{id:int}")]
-    public async Task<ActionResult> Pacth(int id, JsonPatchDocument<DTORoleCreate> patchDocument)
-    {
-        if (patchDocument is null)
-        {
-            return BadRequest();
-        }
+    // [HttpPatch("{id:int}")]
+    // public async Task<ActionResult> Pacth(int id, JsonPatchDocument<DTORoleCreate> patchDocument)
+    // {
+    //     if (patchDocument is null)
+    //     {
+    //         return BadRequest();
+    //     }
 
-        var role = await context.Roles.FirstOrDefaultAsync(roleDB => roleDB.Id == id);
-        if (role is null)
-        {
-            return NotFound();
-        }
+    //     var role = await context.Roles.FirstOrDefaultAsync(roleDB => roleDB.Id == id);
+    //     if (role is null)
+    //     {
+    //         return NotFound();
+    //     }
 
-        var dtoRole = mapper.Map<DTORoleCreate>(role);
+    //     var dtoRole = mapper.Map<DTORoleCreate>(role);
 
-        patchDocument.ApplyTo(dtoRole, ModelState);
+    //     patchDocument.ApplyTo(dtoRole, ModelState);
 
-        var isValid = TryValidateModel(dtoRole);
-        if (!isValid)
-        {
-            return BadRequest(ModelState);
-        }
+    //     var isValid = TryValidateModel(dtoRole);
+    //     if (!isValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
 
-        mapper.Map(dtoRole, role);
+    //     mapper.Map(dtoRole, role);
 
-        await context.SaveChangesAsync();
-        return NoContent();
-    }
+    //     await context.SaveChangesAsync();
+    //     return NoContent();
+    // }
 
-    [HttpDelete("{id:int}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var roleExists = await context.Roles.AnyAsync(x => x.Id == id);
-        if (!roleExists)
-        {
-            return NotFound();
-        }
+    // [HttpDelete("{id:int}")]
+    // public async Task<ActionResult> Delete(int id)
+    // {
+    //     var roleExists = await context.Roles.AnyAsync(x => x.Id == id);
+    //     if (!roleExists)
+    //     {
+    //         return NotFound();
+    //     }
 
-        context.Remove(new Role() { Id = id });
-        await context.SaveChangesAsync();
-        return NoContent();
-    }
+    //     context.Remove(new Role() { Id = id });
+    //     await context.SaveChangesAsync();
+    //     return NoContent();
+    // }
 
 }
