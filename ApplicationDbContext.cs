@@ -13,11 +13,12 @@ public class ApplicationDbContext : IdentityDbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder); // este no se borra sino,no funcionara el identity
+        base.OnModelCreating(builder); // este no se borra porque no funcionara el identity
 
         // aqui se pueden crear las llaves compuestas
     }
 
-    // public DbSet<User> User { get; set; }
-    // public DbSet<Role> Role { get; set; }
+    public DbSet<Technology> Technologies { get; set; }
+    public DbSet<Entry> Entries { get; set; }
+    public DbSet<EntryComment> EntryComments { get; set; }
 }

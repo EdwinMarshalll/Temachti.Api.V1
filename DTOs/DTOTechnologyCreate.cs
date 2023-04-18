@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Temachti.Api.Entities;
+namespace Temachti.Api.DTOs;
 
-public class Technology
+public class DTOTechnologyCreate
 {
-    public int Id { get; set; }
-
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [StringLength(maximumLength: 15)]
+    [StringLength(maximumLength: 20)]
     [Display(Name = "Codigo")]
     public string Code { get; set; }
 
@@ -20,7 +18,4 @@ public class Technology
     [StringLength(maximumLength: 100)]
     [Display(Name = "Descripcion")]
     public string Description { get; set; }
-
-    [Display(Name = "Fecha de creacion")]
-    public DateTime CreatedAt { get; set; }
 }

@@ -8,6 +8,14 @@ public class AutoMapperProfiles : Profile
 {
     public AutoMapperProfiles()
     {
-        
+        // Entradas
+        CreateMap<DTOEntryCreate, Entry>();
+        CreateMap<Entry, DTOEntry>();
+        CreateMap<Entry, DTOEntryWithTechnology>();
+
+        // Tecnologias
+        CreateMap<DTOTechnologyCreate, Technology>();
+        CreateMap<Technology, DTOTechnology>();
     }
+
 }

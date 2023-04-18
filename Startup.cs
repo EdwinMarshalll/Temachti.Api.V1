@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +16,7 @@ public class Startup
 {
     public Startup(IConfiguration configuration)
     {
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // limpiamos el mapeo de los tipos de claims. Por ejemplo el claim de tipo email no se reconoce si no se limpia
         Configuration = configuration;
     }
 

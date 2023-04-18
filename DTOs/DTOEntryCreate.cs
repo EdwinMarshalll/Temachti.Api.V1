@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
 
-namespace Temachti.Api.Entities;
+namespace Temachti.Api.DTOs;
 
-public class Entry
+public class DTOEntryCreate
 {
-    public int Id { get; set; }
-    
     [Required]
     [StringLength(maximumLength: 20)]
     public string Code { get; set; }
@@ -22,17 +19,6 @@ public class Entry
     [Required]
     public string Content { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; }
-
-    public double Rating { get; set; }
-
     public string Tags { get; set; }
-
     public int TechnologyId { get; set; }
-    public string UserId { get; set; }
-
-    
-    public Technology Technology { get; set; }
-    public IdentityUser User { get; set; }
 }
