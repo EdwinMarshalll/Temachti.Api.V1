@@ -285,10 +285,7 @@ namespace Temachti.Api.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EntryId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EntryId1")
+                    b.Property<int>("EntryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Likes")
@@ -299,7 +296,7 @@ namespace Temachti.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EntryId1");
+                    b.HasIndex("EntryId");
 
                     b.HasIndex("UserId");
 
@@ -409,7 +406,9 @@ namespace Temachti.Api.Migrations
                 {
                     b.HasOne("Temachti.Api.Entities.Entry", "Entry")
                         .WithMany()
-                        .HasForeignKey("EntryId1");
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()

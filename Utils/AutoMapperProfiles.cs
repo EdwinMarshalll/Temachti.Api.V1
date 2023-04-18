@@ -16,6 +16,10 @@ public class AutoMapperProfiles : Profile
         // Tecnologias
         CreateMap<DTOTechnologyCreate, Technology>();
         CreateMap<Technology, DTOTechnology>();
+
+        // Comentarios de entradas
+        CreateMap<DTOEntryCommentCreate, EntryComment>();
+        CreateMap<EntryComment, DTOEntryComment>();
     }
 
 }
