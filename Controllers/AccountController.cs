@@ -38,7 +38,7 @@ public class AccountController:ControllerBase
 
         if(result.Succeeded)
         {
-            return CreateToken(userCredentials);
+            return await CreateToken(userCredentials);
         }
         else
         {
@@ -53,7 +53,7 @@ public class AccountController:ControllerBase
 
         if(result.Succeeded)
         {
-            return CreateToken(userCredentials);
+            return await CreateToken(userCredentials);
         }
         else
         {
@@ -63,7 +63,7 @@ public class AccountController:ControllerBase
 
     [HttpGet("RefreshToken")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public ActionResult<DTOAuthenticationRequest> RefreshToken()
+    public async Task<ActionResult<DTOAuthenticationRequest>> RefreshToken()
     {
         var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
         var email = emailClaim.Value;
@@ -72,19 +72,22 @@ public class AccountController:ControllerBase
             Email = email
         };
 
-        return CreateToken(userCredentials);
+        return await CreateToken(userCredentials);
     }
 
-    private DTOAuthenticationRequest CreateToken(DTOUserCredentials userCredentials)
+    private async Task<DTOAuthenticationRequest> CreateToken(DTOUserCredentials userCredentials)
     {
         var claims = new List<Claim>()
         {
             new Claim("email", userCredentials.Email)
         };
 
+        var user = await userManager.FindByEmailAsync(userCredentials.Email);
+        var claimsDB = await userManager.GetClaimsAsync(user);
+        claims.AddRange(claimsDB);
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwtkey"]));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var expiration = DateTime.UtcNow.AddDays(6);
 
         var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiration, signingCredentials: cred);
@@ -94,5 +97,23 @@ public class AccountController:ControllerBase
             Token = new JwtSecurityTokenHandler().WriteToken(securityToken),
             Expiration = expiration
         };
+    }
+
+    [HttpPost("AddAdmin")]
+    public async Task<ActionResult> ConvertToAdmin(DTOAdminEdit dtoAdminEdit)
+    {
+        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
+        // hacer admin
+        await userManager.AddClaimAsync(user, new Claim("isAdmin","algun valor"));
+        return NoContent();
+    }
+
+    [HttpPost("RemoveAdmin")]
+    public async Task<ActionResult> RemoveAdmin(DTOAdminEdit dtoAdminEdit)
+    {
+        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
+        // remover admin
+        await userManager.RemoveClaimAsync(user, new Claim("isAdmin","algun valor"));
+        return NoContent();
     }
 }

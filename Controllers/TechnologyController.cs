@@ -11,6 +11,7 @@ namespace Temachti.Api.Controllers;
 
 [ApiController]
 [Route("api/tecnologias")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
 public class TechnologyController : ControllerBase
 {
     private readonly ApplicationDbContext context;
@@ -27,10 +28,10 @@ public class TechnologyController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<DTOEntry>>> Get()
+    public async Task<ActionResult<List<DTOTechnology>>> Get()
     {
-        var entries = await context.Entries.ToListAsync();
-        return mapper.Map<List<DTOEntry>>(entries);
+        var technologies = await context.Technologies.ToListAsync();
+        return mapper.Map<List<DTOTechnology>>(technologies);
     }
 
     [HttpGet("{id:int}", Name = "GetTechnologyById")]

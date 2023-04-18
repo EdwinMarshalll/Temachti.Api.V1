@@ -97,6 +97,13 @@ public class Startup
             .AddDefaultTokenProviders()
         ;
 
+        // agregamos autorizacion basada en claims
+        services.AddAuthorization(opciones => 
+        {
+            opciones.AddPolicy("isAdmin", politica => politica.RequireClaim("isAdmin"));
+            opciones.AddPolicy("isDeveloper", politica => politica.RequireClaim("isDeveloper"));
+        });
+
     }
 
     /// <summary>
