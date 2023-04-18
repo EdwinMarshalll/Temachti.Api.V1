@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -57,6 +59,20 @@ public class AccountController:ControllerBase
         {
             return BadRequest("Login incorrecto");
         }
+    }
+
+    [HttpGet("RefreshToken")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public ActionResult<DTOAuthenticationRequest> RefreshToken()
+    {
+        var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+        var email = emailClaim.Value;
+        var userCredentials = new DTOUserCredentials()
+        {
+            Email = email
+        };
+
+        return CreateToken(userCredentials);
     }
 
     private DTOAuthenticationRequest CreateToken(DTOUserCredentials userCredentials)
