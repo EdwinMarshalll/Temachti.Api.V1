@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Temachti.Api.DTOs;
+using Temachti.Api.Services;
 
 namespace Temachti.Api.Controllers;
 
@@ -17,12 +18,14 @@ public class AccountController:ControllerBase
     private readonly UserManager<IdentityUser> userManager;
     private readonly IConfiguration configuration;
     private readonly SignInManager<IdentityUser> signInManager;
+    private readonly HashService hashService;
 
-    public AccountController(UserManager<IdentityUser> userManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+    public AccountController(UserManager<IdentityUser> userManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager, HashService hashService)
     {
         this.userManager = userManager;
         this.configuration = configuration;
         this.signInManager = signInManager;
+        this.hashService = hashService;
     }
 
     [HttpPost("register")]
@@ -115,5 +118,13 @@ public class AccountController:ControllerBase
         // remover admin
         await userManager.RemoveClaimAsync(user, new Claim("isAdmin","algun valor"));
         return NoContent();
+    }
+
+    // TODO: ejemplo de utilizacion del servicio de Hash
+    [HttpGet("Hash/{text}")]
+    public ActionResult Hash(string text)
+    {
+        var result = hashService.Hash(text);
+        return Ok(result);
     }
 }

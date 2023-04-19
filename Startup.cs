@@ -118,6 +118,8 @@ public class Startup
             });
         }); 
 
+        // servicio para Hashear con una sal
+        services.AddTransient<HashService>();
     }
 
     /// <summary>
