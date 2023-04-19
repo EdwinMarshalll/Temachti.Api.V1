@@ -10,7 +10,7 @@ using Temachti.Api.Entities;
 namespace Temachti.Api.Controllers;
 
 [ApiController]
-[Route("api/tecnologias")]
+[Route("api/technologies")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
 public class TechnologyController : ControllerBase
 {

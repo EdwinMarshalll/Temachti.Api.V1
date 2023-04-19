@@ -104,6 +104,20 @@ public class Startup
             opciones.AddPolicy("isDeveloper", politica => politica.RequireClaim("isDeveloper"));
         });
 
+        // agregamos politica de CORS - relevante para web apps
+        services.AddCors(opciones => 
+        {
+            opciones.AddDefaultPolicy(builder =>
+            {
+                builder
+                    .WithOrigins("https://localhost:7005","https://otra-ruta.com")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    //.WithExposedHeaders()
+                ;
+            });
+        }); 
+
     }
 
     /// <summary>
@@ -124,6 +138,8 @@ public class Startup
         app.UseRouting();
 
         app.UseResponseCaching();
+
+        app.UseCors();
 
         app.UseAuthorization();
 
