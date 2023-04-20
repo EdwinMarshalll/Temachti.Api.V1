@@ -1,6 +1,6 @@
 namespace Temachti.Api.DTOs;
 
-public class DTOTechnology
+public class DTOTechnology : Resource
 {
     public int Id { get; set; }
     public string Code { get; set; }

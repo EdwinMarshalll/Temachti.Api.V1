@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Temachti.Api.DTOs;
 using Temachti.Api.Entities;
+using Temachti.Api.Utils;
 
 namespace Temachti.Api.Controllers;
 
@@ -27,14 +28,18 @@ public class TechnologyController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "getTechnologies")]
+    [AllowAnonymous]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult<List<DTOTechnology>>> Get()
     {
         var technologies = await context.Technologies.ToListAsync();
         return mapper.Map<List<DTOTechnology>>(technologies);
     }
 
-    [HttpGet("{id:int}", Name = "GetTechnologyById")]
+    [HttpGet("{id:int}", Name = "getTechnologyById")]
+    [AllowAnonymous]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult<DTOTechnology>> GetBytId(int id)
     {
         var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Id == id);
@@ -47,8 +52,7 @@ public class TechnologyController : ControllerBase
         return mapper.Map<DTOTechnology>(technology);
     }
 
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost(Name = "createTechnology")]
     public async Task<ActionResult> Post(DTOTechnologyCreate dtoTechnologyCreate)
     {
         var codeExists = await context.Technologies.AnyAsync(techDB => techDB.Code == dtoTechnologyCreate.Code);
@@ -71,6 +75,6 @@ public class TechnologyController : ControllerBase
 
         var dtoTechnology = mapper.Map<DTOTechnology>(technology);
 
-        return CreatedAtRoute("GetTechnologyById", new { Id = technology.Id }, dtoTechnology);
+        return CreatedAtRoute("getTechnologyById", new { Id = technology.Id }, dtoTechnology);
     }
 }

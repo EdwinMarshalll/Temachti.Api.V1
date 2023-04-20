@@ -3,12 +3,14 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Temachti.Api.Filters;
 using Temachti.Api.Middlewares;
 using Temachti.Api.Services;
+using Temachti.Api.Utils;
 
 namespace Temachti.Api;
 
@@ -61,7 +63,9 @@ public class Startup
         services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Temachti.api", Version = "v1" });
-
+                // agregamos el filtro de HATEOAS al swagger
+                c.OperationFilter<AddHATEOASParameter>();
+                
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -120,6 +124,11 @@ public class Startup
 
         // servicio para Hashear con una sal
         services.AddTransient<HashService>();
+
+        //configuramos los servicios para HATEOAS
+        services.AddTransient<LinksGenerator>();
+        services.AddTransient<HATEOASTechnologyFilterAttribute>();
+        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
     }
 
     /// <summary>
