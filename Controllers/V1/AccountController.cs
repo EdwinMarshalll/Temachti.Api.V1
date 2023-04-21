@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Temachti.Api.DTOs;
 using Temachti.Api.Services;
+using Temachti.Api.Utils;
 
-namespace Temachti.Api.Controllers;
+namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/accounts")]
+[HeaderContainsAttribute("x-version", "1")]
 public class AccountController:ControllerBase
 {
     private readonly UserManager<IdentityUser> userManager;
@@ -28,7 +30,7 @@ public class AccountController:ControllerBase
         this.hashService = hashService;
     }
 
-    [HttpPost("register")]
+    [HttpPost("register", Name = "registerV1")]
     public async Task<ActionResult<DTOAuthenticationRequest>> Register(DTOUserCredentials userCredentials)
     {
         var user = new IdentityUser
@@ -49,7 +51,7 @@ public class AccountController:ControllerBase
         }
     }
 
-    [HttpPost("login")]
+    [HttpPost("login", Name = "loginV1")]
     public async Task<ActionResult<DTOAuthenticationRequest>> Login(DTOUserCredentials userCredentials)
     {
         var result = await signInManager.PasswordSignInAsync(userCredentials.Email, userCredentials.Password, isPersistent: false, lockoutOnFailure: false);
@@ -60,11 +62,11 @@ public class AccountController:ControllerBase
         }
         else
         {
-            return BadRequest("Login incorrecto");
+            return BadRequest("Usuario o contrasena incorrectos");
         }
     }
 
-    [HttpGet("RefreshToken")]
+    [HttpGet("RefreshToken", Name = "refreshTokenV1")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<DTOAuthenticationRequest>> RefreshToken()
     {
@@ -76,6 +78,32 @@ public class AccountController:ControllerBase
         };
 
         return await CreateToken(userCredentials);
+    }
+
+    [HttpPost("AddAdmin", Name = "addAdminV1")]
+    public async Task<ActionResult> ConvertToAdmin(DTOAdminEdit dtoAdminEdit)
+    {
+        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
+        // hacer admin
+        await userManager.AddClaimAsync(user, new Claim("isAdmin","algun valor"));
+        return NoContent();
+    }
+
+    [HttpPost("RemoveAdmin", Name = "removeAdminV1")]
+    public async Task<ActionResult> RemoveAdmin(DTOAdminEdit dtoAdminEdit)
+    {
+        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
+        // remover admin
+        await userManager.RemoveClaimAsync(user, new Claim("isAdmin","algun valor"));
+        return NoContent();
+    }
+
+    // NOTE: ejemplo de utilizacion del servicio de Hash
+    [HttpGet("Hash/{text}", Name = "hashV1")]
+    public ActionResult Hash(string text)
+    {
+        var result = hashService.Hash(text);
+        return Ok(result);
     }
 
     private async Task<DTOAuthenticationRequest> CreateToken(DTOUserCredentials userCredentials)
@@ -100,31 +128,5 @@ public class AccountController:ControllerBase
             Token = new JwtSecurityTokenHandler().WriteToken(securityToken),
             Expiration = expiration
         };
-    }
-
-    [HttpPost("AddAdmin")]
-    public async Task<ActionResult> ConvertToAdmin(DTOAdminEdit dtoAdminEdit)
-    {
-        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
-        // hacer admin
-        await userManager.AddClaimAsync(user, new Claim("isAdmin","algun valor"));
-        return NoContent();
-    }
-
-    [HttpPost("RemoveAdmin")]
-    public async Task<ActionResult> RemoveAdmin(DTOAdminEdit dtoAdminEdit)
-    {
-        var user = await userManager.FindByEmailAsync(dtoAdminEdit.Email);
-        // remover admin
-        await userManager.RemoveClaimAsync(user, new Claim("isAdmin","algun valor"));
-        return NoContent();
-    }
-
-    // TODO: ejemplo de utilizacion del servicio de Hash
-    [HttpGet("Hash/{text}")]
-    public ActionResult Hash(string text)
-    {
-        var result = hashService.Hash(text);
-        return Ok(result);
     }
 }

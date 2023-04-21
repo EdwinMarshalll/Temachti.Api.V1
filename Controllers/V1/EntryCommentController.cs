@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Temachti.Api.DTOs;
 using Temachti.Api.Entities;
+using Temachti.Api.Utils;
 
-namespace Temachti.Api.Controllers;
+namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/entradas/{entryId:int}/comentarios")]
+[HeaderContainsAttribute("x-version", "1")]
 public class EntryCommentController : ControllerBase
 {
     private readonly ApplicationDbContext context;
@@ -26,7 +28,7 @@ public class EntryCommentController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "getEntryCommentsV1")]
     public async Task<ActionResult<List<DTOEntryComment>>> Get(int entryId)
     {
         var entryExist = await context.Entries.AnyAsync(entryDB => entryDB.Id == entryId);
@@ -40,7 +42,7 @@ public class EntryCommentController : ControllerBase
         return mapper.Map<List<DTOEntryComment>>(entryComments);
     }
 
-    [HttpGet("{id:int}", Name = "GetEntryCommentById")]
+    [HttpGet("{id:int}", Name = "getEntryCommentByIdV1")]
     public async Task<ActionResult<DTOEntryComment>> GetById(int id)
     {
         var entryComment = await context.EntryComments.FirstOrDefaultAsync(entryCommentDB => entryCommentDB.Id == id);
@@ -53,7 +55,7 @@ public class EntryCommentController : ControllerBase
         return mapper.Map<DTOEntryComment>(entryComment);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "createEntryCommentV1")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> Post(int entryId, DTOEntryCommentCreate dtoEntryCommentCreate)
     {
@@ -79,10 +81,10 @@ public class EntryCommentController : ControllerBase
 
         var dtoEntryComment = mapper.Map<DTOEntryComment>(entryComment);
 
-        return CreatedAtRoute("GetEntryCommentById", new { Id = entryComment.Id, EntryId = entryId, }, dtoEntryComment);
+        return CreatedAtRoute("getEntryCommentByIdV1", new { Id = entryComment.Id, EntryId = entryId, }, dtoEntryComment);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:int}", Name = "updateEntryCommentV1")]
     public async Task<ActionResult> Put(int entryId, int id, DTOEntryCommentCreate dtoEntryCommentCreate)
     {
         var entryExists = await context.EntryComments.AnyAsync(entryDB => entryDB.Id == entryId);

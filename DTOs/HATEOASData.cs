@@ -2,14 +2,14 @@ namespace Temachti.Api.DTOs;
 
 public class HATEOASData
 {
-    public string Link { get; private set; }    
-    public string Description { get; private set; }
+    public string Href { get; private set; }    
+    public string Rel { get; private set; }
     public string Method { get; private set; }
 
-    public HATEOASData(string link, string description, string method)
+    public HATEOASData(string href, string rel, string method)
     {
-        this.Link = link;
-        this.Description = description;
+        this.Href = href;
+        this.Rel = rel;
         this.Method = method;
     }
 }

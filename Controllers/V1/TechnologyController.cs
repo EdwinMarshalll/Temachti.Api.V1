@@ -9,10 +9,11 @@ using Temachti.Api.DTOs;
 using Temachti.Api.Entities;
 using Temachti.Api.Utils;
 
-namespace Temachti.Api.Controllers;
+namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/technologies")]
+[HeaderContainsAttribute("x-version", "1")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
 public class TechnologyController : ControllerBase
 {
@@ -29,7 +30,7 @@ public class TechnologyController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpGet(Name = "getTechnologies")]
+    [HttpGet(Name = "getTechnologiesV1")]
     [AllowAnonymous]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult<List<DTOTechnology>>> Get()
@@ -38,7 +39,7 @@ public class TechnologyController : ControllerBase
         return mapper.Map<List<DTOTechnology>>(technologies);
     }
 
-    [HttpGet("{id:int}", Name = "getTechnologyById")]
+    [HttpGet("{id:int}", Name = "getTechnologyByIdV1")]
     [AllowAnonymous]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult<DTOTechnology>> GetBytId(int id)
@@ -53,7 +54,7 @@ public class TechnologyController : ControllerBase
         return mapper.Map<DTOTechnology>(technology);
     }
 
-    [HttpGet("{code}", Name = "getTechnologyByCode")]
+    [HttpGet("{code}", Name = "getTechnologyByCodeV1")]
     [AllowAnonymous]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult<DTOTechnology>> GetByCode(string code)
@@ -67,7 +68,7 @@ public class TechnologyController : ControllerBase
         return mapper.Map<DTOTechnology>(technology);
     }
 
-    [HttpPost(Name = "createTechnology")]
+    [HttpPost(Name = "createTechnologyV1")]
     public async Task<ActionResult> Post(DTOTechnologyCreate dtoTechnologyCreate)
     {
         var codeExists = await context.Technologies.AnyAsync(techDB => techDB.Code == dtoTechnologyCreate.Code);
@@ -90,10 +91,10 @@ public class TechnologyController : ControllerBase
 
         var dtoTechnology = mapper.Map<DTOTechnology>(technology);
 
-        return CreatedAtRoute("getTechnologyById", new { Id = technology.Id }, dtoTechnology);
+        return CreatedAtRoute("getTechnologyByIdV1", new { Id = technology.Id }, dtoTechnology);
     }
 
-    [HttpPut("{id:int}", Name = "updateTechnology")]
+    [HttpPut("{id:int}", Name = "updateTechnologyV1")]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult> Put(DTOTechnologyCreate dtoTechnologyCreate, int id)
     {
@@ -111,7 +112,7 @@ public class TechnologyController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{id:int}", Name = "patchTechnology")]
+    [HttpPatch("{id:int}", Name = "patchTechnologyV1")]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult> Patch(int id, JsonPatchDocument<DTOTechnologyPatch> patchDocument)
     {
@@ -144,7 +145,7 @@ public class TechnologyController : ControllerBase
     }
 
 
-    [HttpDelete("{id:int}", Name = "deleteTechnology")]
+    [HttpDelete("{id:int}", Name = "deleteTechnologyV1")]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult> Delete(int id)
     {

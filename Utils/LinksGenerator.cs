@@ -31,13 +31,13 @@ public class LinksGenerator
         var isAdmin = await IsAdmin();
         var Url = BuildURLHelper();
 
-        dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyById", new { id = dtoTechnology.Id }), description: "self", method: "GET"));
-        dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyByCode", new {code = dtoTechnology.Code}), description: "self", method: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyById", new { id = dtoTechnology.Id }), rel: "self", method: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyByCode", new {code = dtoTechnology.Code}), rel: "self", method: "GET"));
 
         if(isAdmin)
         {
-            dtoTechnology.Links.Add(new HATEOASData(Url.Link("updateTechnology", new { id = dtoTechnology.Id }), description: "update technology", method: "PUT"));
-            dtoTechnology.Links.Add(new HATEOASData(Url.Link("deleteTechnology", new { id = dtoTechnology.Id }), description: "delete technology", method: "DELETE"));
+            dtoTechnology.Links.Add(new HATEOASData(Url.Link("updateTechnology", new { id = dtoTechnology.Id }), rel: "update technology", method: "PUT"));
+            dtoTechnology.Links.Add(new HATEOASData(Url.Link("deleteTechnology", new { id = dtoTechnology.Id }), rel: "delete technology", method: "DELETE"));
         }
     }
     #endregion

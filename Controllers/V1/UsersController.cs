@@ -5,10 +5,11 @@ using Temachti.Api.DTOs;
 using AutoMapper;
 using Temachti.Api.Utils;
 
-namespace Temachti.Api.Controllers;
+namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/users")]
+[HeaderContainsAttribute("x-version", "1")]
 // [Authorize]
 public class UsersController : ControllerBase
 {

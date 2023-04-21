@@ -26,6 +26,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        #region CONTROLLERS
         services.AddControllers(opciones =>
             {
                 // agregamos el filtro de excepciones
@@ -39,19 +40,21 @@ public class Startup
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             }
         ).AddNewtonsoftJson();
+        #endregion
 
-        // Configuramos el servicio de DbContext
+        #region DBCONTEXT
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
         );
+        #endregion
 
-        //TODO: servicio recurrente comentado
+        // NOTE: servicio recurrente comentado
         // services.AddHostedService<HostedWriteFile>();
 
-        //TODO: agregamos cache a las respuestas
+        // NOTE: agregamos cache a las respuestas
         // services.AddResponseCaching();
 
-        // agregamos autenticacion
+        #region AUTHETICATION
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters{
             ValidateIssuer = false,
             ValidateAudience = false,
@@ -60,14 +63,18 @@ public class Startup
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["jwtkey"])),
             ClockSkew = TimeSpan.Zero // tiempo de gracia por defecto es 5 minutos
         });
+        #endregion
 
+        #region SWAGGER
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Temachti.Api", Version = "v1" });
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "Temachti.Api", Version = "v2" });
-                // agregamos el filtro de HATEOAS al swagger
+                
+                // agregamos el filtro de HATEOAS y XVersion
                 c.OperationFilter<AddHATEOASParameter>();
+                c.OperationFilter<AddXVersionParameter>();
                 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -94,24 +101,28 @@ public class Startup
                 });
             }
         );
+        #endregion
 
-        //configuramos AutoMapper
+        #region AUTOMAPPER
         services.AddAutoMapper(typeof(Startup));
+        #endregion
 
-        //configuramos el identity
+        #region IDENTITY
         services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
         ;
+        #endregion
 
-        // agregamos autorizacion basada en claims
+        #region CLAIMS AUTHORIZATION
         services.AddAuthorization(opciones => 
         {
             opciones.AddPolicy("isAdmin", politica => politica.RequireClaim("isAdmin"));
             opciones.AddPolicy("isDeveloper", politica => politica.RequireClaim("isDeveloper"));
         });
+        #endregion
 
-        // agregamos politica de CORS - relevante para web apps
+        #region CORS - reelevante unicamente para web apps
         services.AddCors(opciones => 
         {
             opciones.AddDefaultPolicy(builder =>
@@ -124,14 +135,16 @@ public class Startup
                 ;
             });
         }); 
+        #endregion
 
         // servicio para Hashear con una sal
         services.AddTransient<HashService>();
 
-        //configuramos los servicios para HATEOAS
+        #region HATEOAS
         services.AddTransient<LinksGenerator>();
         services.AddTransient<HATEOASTechnologyFilterAttribute>();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+        #endregion
     }
 
     /// <summary>
