@@ -30,6 +30,8 @@ public class Startup
             {
                 // agregamos el filtro de excepciones
                 opciones.Filters.Add(typeof(FilterException));
+                // agregamos el versionador de swagger
+                opciones.Conventions.Add(new SwaggerGroupByVersion());
             }
         ).AddJsonOptions(x =>
             {
@@ -62,7 +64,8 @@ public class Startup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Temachti.api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Temachti.Api", Version = "v1" });
+                c.SwaggerDoc("v2", new OpenApiInfo { Title = "Temachti.Api", Version = "v2" });
                 // agregamos el filtro de HATEOAS al swagger
                 c.OperationFilter<AddHATEOASParameter>();
                 
@@ -141,7 +144,12 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => 
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Temachti.Api v1");
+                    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Temachti.Api v2");
+                }                
+            );
         }
 
         app.UseHttpsRedirection();
