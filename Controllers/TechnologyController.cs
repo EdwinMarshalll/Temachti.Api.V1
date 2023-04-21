@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Temachti.Api.DTOs;
@@ -52,6 +53,20 @@ public class TechnologyController : ControllerBase
         return mapper.Map<DTOTechnology>(technology);
     }
 
+    [HttpGet("{code}", Name = "getTechnologyByCode")]
+    [AllowAnonymous]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    public async Task<ActionResult<DTOTechnology>> GetByCode(string code)
+    {
+        var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Code == code);
+        if(technology is null)
+        {
+            return NotFound();
+        }
+
+        return mapper.Map<DTOTechnology>(technology);
+    }
+
     [HttpPost(Name = "createTechnology")]
     public async Task<ActionResult> Post(DTOTechnologyCreate dtoTechnologyCreate)
     {
@@ -77,4 +92,71 @@ public class TechnologyController : ControllerBase
 
         return CreatedAtRoute("getTechnologyById", new { Id = technology.Id }, dtoTechnology);
     }
+
+    [HttpPut("{id:int}", Name = "updateTechnology")]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    public async Task<ActionResult> Put(DTOTechnologyCreate dtoTechnologyCreate, int id)
+    {
+        var exists = await context.Technologies.AnyAsync(techDB => techDB.Id == id);
+        if(!exists)
+        {
+            return NotFound();
+        }
+
+        var technology = mapper.Map<Technology>(dtoTechnologyCreate);
+        technology.Id = id;
+        
+        context.Update(technology);
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPatch("{id:int}", Name = "patchTechnology")]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    public async Task<ActionResult> Patch(int id, JsonPatchDocument<DTOTechnologyPatch> patchDocument)
+    {
+        if(patchDocument is null)
+        {
+            return BadRequest();
+        }
+
+        var techDB = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Id == id);
+
+        if(techDB is null)
+        {
+            return NotFound();
+        }
+
+        var dtoTechnology = mapper.Map<DTOTechnologyPatch>(techDB);
+
+        patchDocument.ApplyTo(dtoTechnology, ModelState);
+
+        var isValid = TryValidateModel(dtoTechnology);
+        if(!isValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        mapper.Map(dtoTechnology, techDB);
+
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
+
+    [HttpDelete("{id:int}", Name = "deleteTechnology")]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var exists = await context.Technologies.AnyAsync(techDB => techDB.Id == id);
+        if(!exists)
+        {
+            return NotFound();
+        }
+
+        context.Remove(new Technology(){Id = id});
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
 }

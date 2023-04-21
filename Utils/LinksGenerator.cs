@@ -32,6 +32,7 @@ public class LinksGenerator
         var Url = BuildURLHelper();
 
         dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyById", new { id = dtoTechnology.Id }), description: "self", method: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link("getTechnologyByCode", new {code = dtoTechnology.Code}), description: "self", method: "GET"));
 
         if(isAdmin)
         {
