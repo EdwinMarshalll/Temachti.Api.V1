@@ -58,7 +58,8 @@ public class Startup
         // services.AddResponseCaching();
 
         #region AUTHETICATION
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters{
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+        {
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
@@ -72,9 +73,9 @@ public class Startup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo 
-                { 
-                    Title = "Temachti.Api", 
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Temachti.Api",
                     Version = "v1",
                     Description = "Api para TEMACHTI",
                     Contact = new OpenApiContact
@@ -87,11 +88,11 @@ public class Startup
 
 
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "Temachti.Api", Version = "v2" });
-                
+
                 // agregamos el filtro de HATEOAS y XVersion
                 c.OperationFilter<AddHATEOASParameter>();
                 c.OperationFilter<AddXVersionParameter>();
-                
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -136,7 +137,7 @@ public class Startup
         #endregion
 
         #region CLAIMS AUTHORIZATION
-        services.AddAuthorization(opciones => 
+        services.AddAuthorization(opciones =>
         {
             opciones.AddPolicy("isAdmin", politica => politica.RequireClaim("isAdmin"));
             opciones.AddPolicy("isDeveloper", politica => politica.RequireClaim("isDeveloper"));
@@ -144,18 +145,19 @@ public class Startup
         #endregion
 
         #region CORS - reelevante unicamente para web apps
-        services.AddCors(opciones => 
+        services.AddCors(opciones =>
         {
             opciones.AddDefaultPolicy(builder =>
             {
                 builder
-                    .WithOrigins("https://localhost:7005","https://otra-ruta.com")
+                    .WithOrigins("https://localhost:7005", "https://otra-ruta.com")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    //.WithExposedHeaders()
+                    // exponemos el encabezado de totalRecordsQuantity para que se muestre a los clientes
+                    .WithExposedHeaders(new string[] { "totalRecordsQuantity" })
                 ;
             });
-        }); 
+        });
         #endregion
 
         // servicio para Hashear con una sal
@@ -178,11 +180,11 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => 
+            app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Temachti.Api v1");
                     c.SwaggerEndpoint("/swagger/v2/swagger.json", "Temachti.Api v2");
-                }                
+                }
             );
         }
 

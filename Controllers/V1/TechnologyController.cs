@@ -36,9 +36,11 @@ public class TechnologyController : ControllerBase
     [HttpGet(Name = "getTechnologiesV1")]
     [AllowAnonymous]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
-    public async Task<ActionResult<List<DTOTechnology>>> Get()
+    public async Task<ActionResult<List<DTOTechnology>>> Get([FromQuery] DTOPagination dtoPagination)
     {
-        var technologies = await context.Technologies.ToListAsync();
+        var queryable = context.Technologies.AsQueryable();
+        await HttpContext.InsertParametersIntoHeader(queryable);
+        var technologies = await context.Technologies.OrderBy(techDB => techDB.Name).Paginate(dtoPagination).ToListAsync();
         return mapper.Map<List<DTOTechnology>>(technologies);
     }
 
@@ -113,6 +115,7 @@ public class TechnologyController : ControllerBase
     /// Actualiza toda una tecnologia
     /// </summary>
     /// <param name="dtoTechnologyCreate">Modelo de la tecnologia a actualizar</param>
+    /// <param name="id">Id de la tecnologia a actualizar</param>
     [HttpPut("{id:int}", Name = "updateTechnologyV1")]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
     public async Task<ActionResult> Put(DTOTechnologyCreate dtoTechnologyCreate, int id)
