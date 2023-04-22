@@ -13,5 +13,7 @@ public class DTOEntry
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
     public double Rating { get; set; }
+    public int Views { get; set; }
+    public string UrlCover { get; set; }
     public string Tags { get; set; }
 }

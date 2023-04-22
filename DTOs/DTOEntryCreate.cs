@@ -19,6 +19,9 @@ public class DTOEntryCreate
     [Required]
     public string Content { get; set; }
 
+    [Url]
+    public string UrlCover { get; set; }
+
     public string Tags { get; set; }
     public int TechnologyId { get; set; }
 }
