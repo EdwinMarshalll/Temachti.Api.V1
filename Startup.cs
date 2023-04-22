@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +14,7 @@ using Temachti.Api.Middlewares;
 using Temachti.Api.Services;
 using Temachti.Api.Utils;
 
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace Temachti.Api;
 
 public class Startup
@@ -69,7 +72,20 @@ public class Startup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Temachti.Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Temachti.Api", 
+                    Version = "v1",
+                    Description = "Api para TEMACHTI",
+                    Contact = new OpenApiContact
+                    {
+                        Email = "temachti.blog@gmail.com",
+                        Name = "Temachti",
+                        Url = new Uri("https://temachti.online")
+                    }
+                });
+
+
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "Temachti.Api", Version = "v2" });
                 
                 // agregamos el filtro de HATEOAS y XVersion
@@ -99,6 +115,11 @@ public class Startup
                         new string[] {}
                     }
                 });
+
+                // agregamos comentarios
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             }
         );
         #endregion
