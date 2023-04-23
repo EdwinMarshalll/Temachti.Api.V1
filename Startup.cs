@@ -58,7 +58,7 @@ public class Startup
         // NOTE: agregamos cache a las respuestas
         // services.AddResponseCaching();
 
-        #region AUTHETICATION
+        #region AUTHENTICATION
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -167,6 +167,7 @@ public class Startup
         #region HATEOAS
         services.AddTransient<LinksGenerator>();
         services.AddTransient<HATEOASTechnologyFilterAttribute>();
+        services.AddTransient<HATEOASEntryFilterAttribute>();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         #endregion
     }
