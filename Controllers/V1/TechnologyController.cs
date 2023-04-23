@@ -13,7 +13,7 @@ using Temachti.Api.Utils.HATEOAS;
 namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
-[Route("api/technologies")]
+[Route("technologies")]
 [HeaderContainsAttribute("x-version", "1")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
 public class TechnologyController : ControllerBase
@@ -31,57 +31,7 @@ public class TechnologyController : ControllerBase
         this.logger = logger;
     }
 
-    /// <summary>
-    /// Regresa todos las tecnologias
-    /// </summary>
-    [HttpGet(Name = "getTechnologiesV1")]
-    [AllowAnonymous]
-    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
-    public async Task<ActionResult<List<DTOTechnology>>> Get([FromQuery] DTOPagination dtoPagination)
-    {
-        var queryable = context.Technologies.AsQueryable();
-        await HttpContext.InsertParametersIntoHeader(queryable);
-        var technologies = await context.Technologies.OrderBy(techDB => techDB.Name).Paginate(dtoPagination).ToListAsync();
-        return mapper.Map<List<DTOTechnology>>(technologies);
-    }
-
-    /// <summary>
-    /// Regresa una tecnologia por su Id
-    /// </summary>
-    /// <param name="id">Id de la tecnologia</param>
-    [HttpGet("{id:int}", Name = "getTechnologyByIdV1")]
-    [AllowAnonymous]
-    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
-    public async Task<ActionResult<DTOTechnology>> GetBytId(int id)
-    {
-        var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Id == id);
-
-        if (technology is null)
-        {
-            return NotFound();
-        }
-
-        return mapper.Map<DTOTechnology>(technology);
-    }
-
-    /// <summary>
-    /// Regresa una tecnologia por su codigo
-    /// </summary>
-    /// <param name="code">Codigo de la tecnologia</param>
-    [HttpGet("{code}", Name = "getTechnologyByCodeV1")]
-    [AllowAnonymous]
-    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
-    public async Task<ActionResult<DTOTechnology>> GetByCode(string code)
-    {
-        var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Code == code);
-        if (technology is null)
-        {
-            return NotFound();
-        }
-
-        return mapper.Map<DTOTechnology>(technology);
-    }
-
+    #region POST
     /// <summary>
     /// Crea una tecnologia
     /// </summary>
@@ -111,30 +61,63 @@ public class TechnologyController : ControllerBase
 
         return CreatedAtRoute("getTechnologyByIdV1", new { Id = technology.Id }, dtoTechnology);
     }
+    #endregion
+
+    #region GET
+    /// <summary>
+    /// Regresa las tecnologias por pagina
+    /// </summary>
+    [HttpGet(Name = "getTechnologiesV1")]
+    [AllowAnonymous]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    public async Task<ActionResult<List<DTOTechnology>>> Get([FromQuery] DTOPagination dtoPagination)
+    {
+        var queryable = context.Technologies.AsQueryable();
+        await HttpContext.InsertParametersIntoHeader(queryable);
+        var technologies = await context.Technologies.OrderBy(techDB => techDB.Name).Paginate(dtoPagination).ToListAsync();
+        return mapper.Map<List<DTOTechnology>>(technologies);
+    }
 
     /// <summary>
-    /// Actualiza toda una tecnologia
+    /// Regresa una tecnologia por su Id
     /// </summary>
-    /// <param name="dtoTechnologyCreate">Modelo de la tecnologia a actualizar</param>
-    /// <param name="id">Id de la tecnologia a actualizar</param>
-    [HttpPut("{id:int}", Name = "updateTechnologyV1")]
+    /// <param name="id">Id de la tecnologia</param>
+    [HttpGet("{id:int}", Name = "getTechnologyByIdV1")]
+    [AllowAnonymous]
     [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
-    public async Task<ActionResult> Put(DTOTechnologyCreate dtoTechnologyCreate, int id)
+    public async Task<ActionResult<DTOTechnology>> Get(int id)
     {
-        var exists = await context.Technologies.AnyAsync(techDB => techDB.Id == id);
-        if (!exists)
+        var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Id == id);
+
+        if (technology is null)
         {
             return NotFound();
         }
 
-        var technology = mapper.Map<Technology>(dtoTechnologyCreate);
-        technology.Id = id;
-
-        context.Update(technology);
-        await context.SaveChangesAsync();
-        return NoContent();
+        return mapper.Map<DTOTechnology>(technology);
     }
 
+    /// <summary>
+    /// Regresa una tecnologia por su codigo
+    /// </summary>
+    /// <param name="code">Codigo de la tecnologia</param>
+    [HttpGet("{code}", Name = "getTechnologyByCodeV1")]
+    [AllowAnonymous]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<DTOTechnology>> Get(string code)
+    {
+        var technology = await context.Technologies.FirstOrDefaultAsync(techDB => techDB.Code == code);
+        if (technology is null)
+        {
+            return NotFound();
+        }
+
+        return mapper.Map<DTOTechnology>(technology);
+    }
+    #endregion
+
+    #region PATCH
     /// <summary>
     /// Actualiza parcialmente una tecnologia
     /// </summary>
@@ -174,7 +157,36 @@ public class TechnologyController : ControllerBase
         await context.SaveChangesAsync();
         return NoContent();
     }
+    #endregion
 
+    #region PUT
+    /// <summary>
+    /// Actualiza toda una tecnologia
+    /// </summary>
+    /// <param name="dtoTechnologyCreate">Modelo de la tecnologia a actualizar</param>
+    /// <param name="id">Id de la tecnologia a actualizar</param>
+    [HttpPut("{id:int}", Name = "updateTechnologyV1")]
+    [ServiceFilter(typeof(HATEOASTechnologyFilterAttribute))]
+    [ProducesResponseType(204)]
+    public async Task<ActionResult> Put(DTOTechnologyCreate dtoTechnologyCreate, int id)
+    {
+        var exists = await context.Technologies.AnyAsync(techDB => techDB.Id == id);
+        if (!exists)
+        {
+            return NotFound();
+        }
+
+        var technology = mapper.Map<Technology>(dtoTechnologyCreate);
+        technology.Id = id;
+
+        context.Update(technology);
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    #endregion
+
+    #region DELETE
     /// <summary>
     /// Borra una tecnologia
     /// </summary>
@@ -195,5 +207,5 @@ public class TechnologyController : ControllerBase
         await context.SaveChangesAsync();
         return NoContent();
     }
-
+    #endregion
 }
