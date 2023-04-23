@@ -7,7 +7,7 @@ using Temachti.Api.Utils;
 namespace Temachti.Api.Controllers.V1;
 
 [ApiController]
-[Route("api")]
+[Route("root")]
 [HeaderContainsAttribute("x-version", "1")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class RootController : ControllerBase
@@ -27,16 +27,15 @@ public class RootController : ControllerBase
 
         var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
 
-        HATEOASDatas.Add(new HATEOASData(href: Url.Link("getRootv1", new { }), rel: "self", method: "GET"));
+        HATEOASDatas.Add(new HATEOASData(href: Url.Link("getRootv1", new { }), rel: "self", action: "GET"));
 
-        #region TECHNOLOGY
-        HATEOASDatas.Add(new HATEOASData(href: Url.Link("getTechnologiesV1", new { }), rel: "technologies", method: "GET"));
-        #endregion
+        HATEOASDatas.Add(new HATEOASData(href: Url.Link("getTechnologiesV1", new { }), rel: "technologies", action: "GET"));
+        HATEOASDatas.Add(new HATEOASData(href: Url.Link("getEntriesV1", new { }), rel: "entries", action: "GET"));
 
         if (isAdmin.Succeeded)
         {
-            HATEOASDatas.Add(new HATEOASData(href: Url.Link("createTechnology", new { }), rel: "autor-crear", method: "POST"));
-            HATEOASDatas.Add(new HATEOASData(href: Url.Link("updateTechnology", new { }), rel: "libro-crear", method: "POST"));
+            HATEOASDatas.Add(new HATEOASData(href: Url.Link("createTechnologyV1", new { }), rel: "create technology", action: "POST"));
+            HATEOASDatas.Add(new HATEOASData(href: Url.Link("createEntryV1", new { }), rel: "create entry", action: "POST"));
         }
 
         return HATEOASDatas;

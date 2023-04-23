@@ -46,34 +46,41 @@ public class LinksGenerator
     }
 
     #region Links
+    /// <summary> 
+    /// Genera los links de hipermedia para Tecnologias
+    /// </summary>
+    /// <param name="dtoTechnology">Dto de tecnologia</param>
     public async Task GenerateLinks(DTOTechnology dtoTechnology)
     {
         var isAdmin = await IsAdmin();
         var Url = BuildURLHelper();
         var version = GetVersion();
 
-        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByIdV{version}", new { id = dtoTechnology.Id }), rel: "self", method: "GET"));
-        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByCodeV{version}", new { code = dtoTechnology.Code }), rel: "self", method: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByIdV{version}", new { id = dtoTechnology.Id }), rel: "self", action: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByCodeV{version}", new { code = dtoTechnology.Code }), rel: "self", action: "GET"));
 
         if (isAdmin)
         {
-            dtoTechnology.Links.Add(new HATEOASData(Url.Link($"updateTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "update technology", method: "PUT"));
-            dtoTechnology.Links.Add(new HATEOASData(Url.Link($"deleteTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "delete technology", method: "DELETE"));
+            dtoTechnology.Links.Add(new HATEOASData(Url.Link($"updateTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "update technology", action: "PUT"));
+            dtoTechnology.Links.Add(new HATEOASData(Url.Link($"deleteTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "delete technology", action: "DELETE"));
         }
     }
-
+    /// <summary> 
+    /// Genera los links de hipermedia para Entradas
+    /// </summary>
+    /// <param name="dtoEntry">Dto de entrada</param>
     public async Task GenerateLinks(DTOEntry dtoEntry)
     {
         var isAdmin = await IsAdmin();
         var Url = BuildURLHelper();
         var version = GetVersion();
 
-        dtoEntry.Links.Add(new HATEOASData(Url.Link($"getEntryByIdV{version}", new { id = dtoEntry.Id }), rel: "self", method: "GET"));
+        dtoEntry.Links.Add(new HATEOASData(Url.Link($"getEntryByIdV{version}", new { id = dtoEntry.Id }), rel: "self", action: "GET"));
 
         if (isAdmin)
         {
-            dtoEntry.Links.Add(new HATEOASData(Url.Link($"updateEntryV{version}", new { id = dtoEntry.Id }), rel: "update entry", method: "PUT"));
-            dtoEntry.Links.Add(new HATEOASData(Url.Link($"deleteEntryV{version}", new { id = dtoEntry.Id }), rel: "delete entry", method: "DELETE"));
+            dtoEntry.Links.Add(new HATEOASData(Url.Link($"updateEntryV{version}", new { id = dtoEntry.Id }), rel: "update entry", action: "PUT"));
+            dtoEntry.Links.Add(new HATEOASData(Url.Link($"deleteEntryV{version}", new { id = dtoEntry.Id }), rel: "delete entry", action: "DELETE"));
         }
     }
     #endregion
