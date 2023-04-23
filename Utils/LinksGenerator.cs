@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Temachti.Api.DTOs;
@@ -12,7 +11,7 @@ public class LinksGenerator
     private readonly IAuthorizationService authorizationService;
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly IActionContextAccessor actionContextAccessor;
-    
+
     public LinksGenerator(IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor)
     {
         this.authorizationService = authorizationService;
@@ -38,7 +37,7 @@ public class LinksGenerator
     private string GetVersion()
     {
         var headers = httpContextAccessor.HttpContext.Request.Headers;
-        if(headers.ContainsKey("x-version"))
+        if (headers.ContainsKey("x-version"))
         {
             return headers["x-version"];
         }
@@ -54,15 +53,30 @@ public class LinksGenerator
         var version = GetVersion();
 
         dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByIdV{version}", new { id = dtoTechnology.Id }), rel: "self", method: "GET"));
-        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByCodeV{version}", new {code = dtoTechnology.Code}), rel: "self", method: "GET"));
+        dtoTechnology.Links.Add(new HATEOASData(Url.Link($"getTechnologyByCodeV{version}", new { code = dtoTechnology.Code }), rel: "self", method: "GET"));
 
-        if(isAdmin)
+        if (isAdmin)
         {
             dtoTechnology.Links.Add(new HATEOASData(Url.Link($"updateTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "update technology", method: "PUT"));
             dtoTechnology.Links.Add(new HATEOASData(Url.Link($"deleteTechnologyV{version}", new { id = dtoTechnology.Id }), rel: "delete technology", method: "DELETE"));
         }
     }
+
+    public async Task GenerateLinks(DTOEntry dtoEntry)
+    {
+        var isAdmin = await IsAdmin();
+        var Url = BuildURLHelper();
+        var version = GetVersion();
+
+        dtoEntry.Links.Add(new HATEOASData(Url.Link($"getEntryByIdV{version}", new { id = dtoEntry.Id }), rel: "self", method: "GET"));
+
+        if (isAdmin)
+        {
+            dtoEntry.Links.Add(new HATEOASData(Url.Link($"updateEntryV{version}", new { id = dtoEntry.Id }), rel: "update entry", method: "PUT"));
+            dtoEntry.Links.Add(new HATEOASData(Url.Link($"deleteEntryV{version}", new { id = dtoEntry.Id }), rel: "delete entry", method: "DELETE"));
+        }
+    }
     #endregion
 
-    
+
 }

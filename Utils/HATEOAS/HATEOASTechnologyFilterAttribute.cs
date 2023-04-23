@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Temachti.Api.DTOs;
 
-namespace Temachti.Api.Utils;
+namespace Temachti.Api.Utils.HATEOAS;
 
 public class HATEOASTechnologyFilterAttribute : HATEOASFilterAttribute
 {
@@ -17,7 +17,7 @@ public class HATEOASTechnologyFilterAttribute : HATEOASFilterAttribute
     {
         var include = IncludeHATEOAS(context);
 
-        if(!include)
+        if (!include)
         {
             await next();
             return;
@@ -26,7 +26,7 @@ public class HATEOASTechnologyFilterAttribute : HATEOASFilterAttribute
         var result = context.Result as ObjectResult;
 
         var dtoTechnology = result.Value as DTOTechnology;
-        if(dtoTechnology is null)
+        if (dtoTechnology is null)
         {
             var dtoTechnologies = result.Value as List<DTOTechnology> ?? throw new ArgumentException("Se esperaba una instancia de DTOTechnoloy o List<DTOTechnology>");
 

@@ -262,8 +262,14 @@ namespace Temachti.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<string>("UrlCover")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -290,6 +296,9 @@ namespace Temachti.Api.Migrations
 
                     b.Property<int>("Likes")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Modified")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");

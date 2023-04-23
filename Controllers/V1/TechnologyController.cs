@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Temachti.Api.DTOs;
 using Temachti.Api.Entities;
 using Temachti.Api.Utils;
+using Temachti.Api.Utils.HATEOAS;
 
 namespace Temachti.Api.Controllers.V1;
 

@@ -1,10 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
-using Temachti.Api.Entities;
-
 namespace Temachti.Api.DTOs;
 
-public class DTOEntry
+public class DTOEntry : Resource
 {
     public int Id { get; set; }
     public string Title { get; set; }

@@ -13,6 +13,7 @@ using Temachti.Api.Filters;
 using Temachti.Api.Middlewares;
 using Temachti.Api.Services;
 using Temachti.Api.Utils;
+using Temachti.Api.Utils.HATEOAS;
 
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace Temachti.Api;
