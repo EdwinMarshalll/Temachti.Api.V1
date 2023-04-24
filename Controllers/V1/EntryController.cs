@@ -181,7 +181,24 @@ public class EntryController : ControllerBase
     #endregion
 
     #region DELETE
-    // TODO: Agregar endpoint delete
+    /// <summary>
+    /// Borra una entrada
+    /// </summary>
+    /// <param name="id">Id de la entrada</param>
+    [HttpDelete("{id:int}", Name = "deleteEntryV1")]
+    [ServiceFilter(typeof(HATEOASEntryFilterAttribute))]
+    public async Task<ActionResult> Delete(int id)
+    {
+	var exists = await context.Entries.AnyAsync(entryDB => entryDB.Id == id);
+	if(!exists)
+	{
+	    return NotFound();
+	}
+
+	context.Remove( new Entry(){ Id = id });
+	await context.SaveChangesAsync();
+	return NoContent();
+    }
     #endregion
 
 
