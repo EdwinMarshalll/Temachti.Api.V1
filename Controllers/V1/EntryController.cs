@@ -177,7 +177,29 @@ public class EntryController : ControllerBase
     #endregion
 
     #region PUT
-    // TODO: Agregar endpoint put
+    /// <summary>
+    /// Actualiza toda una Entrada
+    /// </summary>
+    /// <param name="dtoEntryCreate">Modelo de la entrada a actualizar</param>
+    /// <param name="id">Id de la entrada a actualizar</param>
+    [HttpPut("{id:int}", Name = "updateEntryV1")]
+    [ServiceFilter(typeof(HATEOASEntryFilterAttribute))]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult> Put(DTOEntryCreate dtoEntryCreate, int id)
+    {
+	var exists = await context.Entries.AnyAsync(entryDB => entryDB.Id == id);
+        if (!exists)
+        {
+		return NotFound();
+        }
+
+        var entry = mapper.Map<Entry>(dtoEntryCreate);
+        entry.Id = id;
+        context.Update(entry);
+	await context.SaveChangesAsync();
+	return NoContent();
+    }
     #endregion
 
     #region DELETE
