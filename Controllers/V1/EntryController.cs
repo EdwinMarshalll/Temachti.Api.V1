@@ -2,7 +2,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Temachti.Api.DTOs;
 using Temachti.Api.Entities;
@@ -121,14 +123,66 @@ public class EntryController : ControllerBase
     #endregion
 
     #region PATCH
+    [HttpPatch("{id:int}", Name = "patchEntryV1")]
+    [ServiceFilter(typeof(HATEOASEntryFilterAttribute))]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult> Patch(int id, JsonPatchDocument<DTOEntryPatch> patchDocument)
+    {
+        if (patchDocument is null)
+        {
+            return BadRequest();
+        }
 
+        var entry = await context.Entries.FirstOrDefaultAsync(entryDB => entryDB.Id == id);
+        if (entry is null)
+        {
+            return NotFound();
+        }
+
+        var dtoEntry = mapper.Map<DTOEntryPatch>(entry);
+
+        patchDocument.ApplyTo(dtoEntry, ModelState);
+        var isValid = TryValidateModel(ModelState);
+        if (!isValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        // verificamos si ya existe una entrada con un codigo al que estamos actualizando que no pertenezca a la propia entrada
+        if (dtoEntry.Code != entry.Code)
+        {
+            var exists = await context.Entries.AnyAsync(entrydb => entrydb.Code == dtoEntry.Code && entrydb.Id != entry.Id);
+            if (exists)
+            {
+                return BadRequest($"Ya existe una entrada con el codigo {dtoEntry.Code}");
+            }
+        }
+
+        // verificamos si cambio la tecnologia
+        if (dtoEntry.TechnologyId != entry.TechnologyId)
+        {
+            var exists = await context.Technologies.AnyAsync(techDB => techDB.Id == dtoEntry.TechnologyId);
+            if (!exists)
+            {
+                return NotFound();
+            }
+        }
+
+        mapper.Map(dtoEntry, entry);
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
     #endregion
 
     #region PUT
-
+    // TODO: Agregar endpoint put
     #endregion
 
-
+    #region DELETE
+    // TODO: Agregar endpoint delete
+    #endregion
 
 
 }

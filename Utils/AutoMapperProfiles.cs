@@ -17,6 +17,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<DTOEntryCreate, Entry>();
         CreateMap<Entry, DTOEntry>();
         CreateMap<Entry, DTOEntryWithTechnology>();
+        CreateMap<Entry, DTOEntryPatch>().ReverseMap();
 
         // Comentarios de entradas
         CreateMap<DTOEntryCommentCreate, EntryComment>();
