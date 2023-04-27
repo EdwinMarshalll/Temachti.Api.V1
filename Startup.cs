@@ -155,7 +155,10 @@ public class Startup
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     // exponemos el encabezado de totalRecordsQuantity para que se muestre a los clientes
-                    .WithExposedHeaders(new string[] { "totalRecordsQuantity" })
+                    .WithExposedHeaders(new string[] {
+                        "totalRecordsQuantity",
+                        "totalPagesQuantity"
+                    })
                 ;
             });
         });
