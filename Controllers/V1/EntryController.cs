@@ -116,6 +116,9 @@ public class EntryController : ControllerBase
             return NotFound();
         }
 
+        entry.Views += 1;
+        await context.SaveChangesAsync();
+        
         entry.User = await userManager.FindByIdAsync(entry.UserId);
 
         return mapper.Map<DTOEntryWithTechnology>(entry);
