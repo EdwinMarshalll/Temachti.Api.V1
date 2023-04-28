@@ -92,7 +92,7 @@ public class EntryController : ControllerBase
     public async Task<ActionResult<List<DTOEntry>>> Get([FromQuery] DTOPagination pagination)
     {
         var queryable = context.Entries.AsQueryable();
-        await HttpContext.InsertParametersIntoHeader(queryable);
+        await HttpContext.InsertParametersIntoHeader(queryable, pagination.RecordsPerPage);
         var entries = await queryable.OrderBy(entry => entry.CreatedAt).Paginate(pagination).ToListAsync();
         return mapper.Map<List<DTOEntry>>(entries);
     }

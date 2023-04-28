@@ -73,7 +73,7 @@ public class TechnologyController : ControllerBase
     public async Task<ActionResult<List<DTOTechnology>>> Get([FromQuery] DTOPagination dtoPagination)
     {
         var queryable = context.Technologies.AsQueryable();
-        await HttpContext.InsertParametersIntoHeader(queryable);
+        await HttpContext.InsertParametersIntoHeader(queryable, dtoPagination.RecordsPerPage);
         var technologies = await context.Technologies.OrderBy(techDB => techDB.Name).Paginate(dtoPagination).ToListAsync();
         return mapper.Map<List<DTOTechnology>>(technologies);
     }
